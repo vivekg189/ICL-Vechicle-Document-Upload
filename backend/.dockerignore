@@ -1,0 +1,16 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.git
+.gitignore
+.dockerignore
+.pytest_cache/
+test_*.py
+seed_test_docs.py
+uploads/*
+!uploads/.gitkeep
