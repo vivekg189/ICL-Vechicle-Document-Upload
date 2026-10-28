@@ -14,9 +14,9 @@ export default function Settings({ backendHealth, onRefreshHealth, vehiclesCount
   const roadmapStages = [
     { title: 'Stage 1: Core Setup & REST Communication', desc: 'React + Flask architecture with health check API & Glassmorphism UI', current: false, completed: true, icon: Server },
     { title: 'Stage 2: PostgreSQL Database & Vehicles CRUD', desc: 'PostgreSQL database vehiclevault with SQLAlchemy ORM and validation', current: false, completed: true, icon: Database },
-    { title: 'Stage 3: PDF Document Upload & Management', desc: 'Real file upload to Flask, metadata in PostgreSQL documents table, View/Download/Delete', current: true, completed: false, icon: FileUp },
+    { title: 'Stage 3: PDF Document Upload & Management', desc: 'Real file upload to Flask, metadata in PostgreSQL documents table, View/Download/Delete', current: false, completed: true, icon: FileUp },
     { title: 'Stage 4: Authentication & User Accounts', desc: 'JWT / Session authentication with multi-user isolation', current: false, completed: false, icon: Lock },
-    { title: 'Stage 5: Containerization & Docker Compose', desc: 'Production-ready multi-container orchestration', current: false, completed: false, icon: Boxes },
+    { title: 'Stage 5: Containerization & Docker Compose', desc: 'Production-ready multi-container orchestration with named volumes and Nginx reverse proxy', current: false, completed: true, icon: Boxes },
   ];
 
   return (

@@ -124,12 +124,11 @@ export default function TopNavbar({
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                 <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Notifications</span>
-                <span style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: 600 }}>Stage 2</span>
               </div>
               <div style={{ fontSize: '0.825rem', color: '#64748b', lineHeight: 1.5 }}>
                 {backendHealth.connected 
                   ? `PostgreSQL is connected with ${vehiclesCount} vehicle${vehiclesCount !== 1 ? 's' : ''} stored in table 'vehicles'.`
-                  : 'Backend is offline. Ensure Python Flask is running on port 5000.'}
+                  : 'Backend is offline. Ensure Docker is running and Flask backend is accessible.'}
               </div>
             </div>
           )}

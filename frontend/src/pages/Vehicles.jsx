@@ -59,7 +59,11 @@ export default function Vehicles({
     }
   };
 
-  const selectedVehicle = useMemo(() => {
+  // Derive unique vehicle types from actual data, always include 'All'
+  const vehicleTypes = useMemo(() => {
+    const types = [...new Set(vehicles.map((v) => v.vehicle_type).filter(Boolean))].sort();
+    return ['All', ...types];
+  }, [vehicles]);
     return vehicles.find((v) => v.id === selectedVehicleId) || (vehicles.length > 0 ? vehicles[0] : null);
   }, [vehicles, selectedVehicleId]);
 
@@ -137,8 +141,7 @@ export default function Vehicles({
         </div>
 
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          {['All', 'Car', 'SUV', 'Motorcycle', 'Electric', 'Commercial'].map((type) => (
-            <button
+          {vehicleTypes.map((type) => (            <button
               key={type}
               className={`btn-secondary ${typeFilter === type ? 'filter-active' : ''}`}
               onClick={() => setTypeFilter(type)}
