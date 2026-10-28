@@ -64,6 +64,8 @@ export default function Vehicles({
     const types = [...new Set(vehicles.map((v) => v.vehicle_type).filter(Boolean))].sort();
     return ['All', ...types];
   }, [vehicles]);
+
+  const selectedVehicle = useMemo(() => {
     return vehicles.find((v) => v.id === selectedVehicleId) || (vehicles.length > 0 ? vehicles[0] : null);
   }, [vehicles, selectedVehicleId]);
 
