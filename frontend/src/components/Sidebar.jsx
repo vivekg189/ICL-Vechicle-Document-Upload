@@ -4,7 +4,6 @@ import {
   Car,
   FileText,
   ClockAlert,
-  Settings,
   ShieldCheck,
   X,
   UploadCloud
@@ -25,7 +24,6 @@ export default function Sidebar({
     { id: 'documents', label: 'Documents', icon: FileText, badge: documentsCount },
     { id: 'upload', label: 'Upload Document', icon: UploadCloud },
     { id: 'expiring', label: 'Expiring Soon', icon: ClockAlert },
-    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   return (
@@ -83,10 +81,6 @@ export default function Sidebar({
         </nav>
 
         <div className="sidebar-footer">
-
-          <div style={{ fontSize: '0.72rem', color: '#94a3b8', textAlign: 'center', padding: '0.2rem' }}>
-            VehicleVault v3.0 • PDF Upload
-          </div>
         </div>
       </aside>
     </>

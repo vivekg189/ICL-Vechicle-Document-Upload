@@ -7,7 +7,7 @@ import Vehicles from './pages/Vehicles';
 import Documents from './pages/Documents';
 import UploadDocument from './pages/UploadDocument';
 import ExpiringSoon from './pages/ExpiringSoon';
-import Settings from './pages/Settings';
+
 import ToastContainer, { toast } from './components/ToastContainer';
 import {
   checkBackendHealth,
@@ -202,15 +202,7 @@ export default function App() {
             onRefresh={() => { fetchDocumentsList(); fetchStats(); }}
           />
         );
-      case 'settings':
-        return (
-          <Settings
-            backendHealth={backendHealth}
-            onRefreshHealth={fetchHealth}
-            vehiclesCount={vehicles.length}
-            documentsCount={documents.length}
-          />
-        );
+
       default:
         return null;
     }
