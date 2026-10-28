@@ -7,8 +7,11 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
+      // Forward all /api requests to the Docker Flask backend.
+      // Port 5001 is the dedicated Vite dev proxy port (docker-compose maps it to
+      // container port 5000) — avoids ambiguity with any local Flask process on 5000.
       '/api': {
-        target: 'http://127.0.0.1:5000',
+        target: 'http://127.0.0.1:5001',
         changeOrigin: true,
       },
     },

@@ -1,5 +1,6 @@
 import os
 import uuid
+import logging
 import mimetypes
 from datetime import datetime, date
 from dotenv import load_dotenv
@@ -7,6 +8,11 @@ from flask import Flask, jsonify, request, send_file, abort
 from flask_cors import CORS
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
 
 from models import db, Vehicle, Document, VALID_DOCUMENT_TYPES
 
@@ -625,10 +631,27 @@ def upload_document():
     relative_path = os.path.join("uploads", stored_filename)
     absolute_path = os.path.join(UPLOAD_FOLDER, stored_filename)
 
+    logging.info(
+        "Upload request: original=%s stored=%s upload_dir=%s",
+        original_filename, stored_filename, UPLOAD_FOLDER,
+    )
+
     try:
         uploaded_file.save(absolute_path)
     except Exception as e:
-        return jsonify({"status": "error", "message": f"Failed to save file: {str(e)}"}), 500
+        logging.error("File save failed: %s → %s", absolute_path, e)
+        return jsonify({"status": "error", "message": "Failed to save file to server."}), 500
+
+    # ---- Verify file was actually written with non-zero size ----
+    if not os.path.exists(absolute_path):
+        logging.error("File not found after save: %s", absolute_path)
+        return jsonify({"status": "error", "message": "File save appeared to succeed but file is missing."}), 500
+    saved_size = os.path.getsize(absolute_path)
+    if saved_size == 0:
+        os.remove(absolute_path)
+        logging.error("File saved as zero bytes: %s", absolute_path)
+        return jsonify({"status": "error", "message": "Uploaded file was saved as empty — upload aborted."}), 500
+    logging.info("File saved successfully: %s (%d bytes)", absolute_path, saved_size)
 
     # ---- Persist metadata to PostgreSQL ----
     try:
@@ -644,6 +667,10 @@ def upload_document():
         )
         db.session.add(document)
         db.session.commit()
+        logging.info(
+            "Document saved to DB: id=%d name=%s vehicle_id=%d",
+            document.id, document.document_name, document.vehicle_id,
+        )
 
         return jsonify({
             "status": "success",
@@ -656,21 +683,29 @@ def upload_document():
         # Clean up saved file if DB insert failed
         if os.path.exists(absolute_path):
             os.remove(absolute_path)
-        return jsonify({"status": "error", "message": f"Database error: {str(e)}"}), 500
+            logging.warning("Rolled back file after DB failure: %s", absolute_path)
+        logging.error("DB insert failed for %s: %s", stored_filename, e)
+        return jsonify({"status": "error", "message": "Database error — upload rolled back."}), 500
 
 
 @app.route("/api/documents/<int:doc_id>/download", methods=["GET"])
 def download_document(doc_id):
     """
     GET /api/documents/<id>/download
-    Streams the PDF file back to the client.
+    Streams the PDF file back to the client as an attachment.
     """
     doc = db.session.get(Document, doc_id)
     if not doc:
         return jsonify({"status": "error", "message": f"Document {doc_id} not found."}), 404
 
-    absolute_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), doc.file_path)
+    # Resolve directly from UPLOAD_FOLDER — safe, volume-aware
+    absolute_path = os.path.join(UPLOAD_FOLDER, doc.file_name)
+    # Prevent path traversal
+    if not os.path.abspath(absolute_path).startswith(os.path.abspath(UPLOAD_FOLDER)):
+        return jsonify({"status": "error", "message": "Invalid file path."}), 400
+
     if not os.path.exists(absolute_path):
+        logging.warning("Download requested but file missing: %s (doc_id=%d)", absolute_path, doc_id)
         return jsonify({"status": "error", "message": "File not found on server. It may have been removed."}), 404
 
     return send_file(
@@ -691,8 +726,14 @@ def view_document(doc_id):
     if not doc:
         return jsonify({"status": "error", "message": f"Document {doc_id} not found."}), 404
 
-    absolute_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), doc.file_path)
+    # Resolve directly from UPLOAD_FOLDER — safe, volume-aware
+    absolute_path = os.path.join(UPLOAD_FOLDER, doc.file_name)
+    # Prevent path traversal
+    if not os.path.abspath(absolute_path).startswith(os.path.abspath(UPLOAD_FOLDER)):
+        return jsonify({"status": "error", "message": "Invalid file path."}), 400
+
     if not os.path.exists(absolute_path):
+        logging.warning("View requested but file missing: %s (doc_id=%d)", absolute_path, doc_id)
         return jsonify({"status": "error", "message": "File not found on server."}), 404
 
     return send_file(
@@ -709,7 +750,8 @@ def delete_document(doc_id):
     if not doc:
         return jsonify({"status": "error", "message": f"Document {doc_id} not found."}), 404
 
-    absolute_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), doc.file_path)
+    # Resolve directly from UPLOAD_FOLDER
+    absolute_path = os.path.join(UPLOAD_FOLDER, doc.file_name)
 
     try:
         db.session.delete(doc)
@@ -718,12 +760,13 @@ def delete_document(doc_id):
         db.session.rollback()
         return jsonify({"status": "error", "message": f"Failed to delete record: {str(e)}"}), 500
 
-    # Delete physical file (best-effort)
+    # Delete physical file (best-effort; record is already gone)
     if os.path.exists(absolute_path):
         try:
             os.remove(absolute_path)
-        except OSError:
-            pass  # Record deleted; file cleanup failure is non-critical
+            logging.info("Deleted file: %s", absolute_path)
+        except OSError as e:
+            logging.warning("Could not delete file %s: %s", absolute_path, e)
 
     return jsonify({
         "status": "success",

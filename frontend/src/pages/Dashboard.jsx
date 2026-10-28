@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Car,
   Plus,
-  Server,
   CheckCircle2,
   RefreshCw,
   FileText,
@@ -155,71 +154,7 @@ export default function Dashboard({
 
   return (
     <div className="content-area" style={{ maxWidth: '1440px', margin: '0 auto' }}>
-      {/* ── TOP HEADER / BACKEND STATUS BAR ── */}
-      <section className="backend-card" id="backend-status-section" style={{ marginBottom: '1.75rem' }}>
-        <div className="backend-info">
-          <div className={`backend-icon-badge ${backendHealth.connected ? 'connected' : 'disconnected'}`}>
-            <Server size={22} />
-          </div>
-          <div>
-            <div className="backend-title">Backend & Database Status</div>
-            <div className="backend-status-display">
-              <span
-                style={{
-                  width: '10px',
-                  height: '10px',
-                  borderRadius: '50%',
-                  display: 'inline-block',
-                  background: backendHealth.connected ? '#10b981' : '#ef4444',
-                  boxShadow: backendHealth.connected ? '0 0 10px rgba(16,185,129,0.6)' : 'none',
-                }}
-              />
-              <span style={{ color: backendHealth.connected ? '#047857' : '#b91c1c', fontWeight: 600 }}>
-                {backendHealth.loading ? 'Verifying...' : backendHealth.connected ? 'PostgreSQL Connected' : 'Disconnected'}
-              </span>
-            </div>
-            <div className="backend-details-text">
-              {backendHealth.connected ? (
-                <>
-                  <span style={{ fontWeight: 600 }}>Response:</span> &quot;{backendHealth.message}&quot;
-                  <span style={{ marginLeft: '8px', color: '#059669', fontWeight: 600 }}>
-                    • Engine: PostgreSQL (Live Query SELECT 1)
-                  </span>
-                  {backendHealth.latency !== null && (
-                    <span style={{ marginLeft: '8px', color: '#64748b' }}>
-                      ({backendHealth.latency}ms • {backendHealth.endpoint})
-                    </span>
-                  )}
-                </>
-              ) : (
-                <span style={{ color: '#b91c1c' }}>{backendHealth.message}</span>
-              )}
-            </div>
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: '0.6rem' }}>
-          <button
-            id="btn-recheck-backend"
-            className="btn-secondary"
-            onClick={onRefreshHealth}
-            disabled={backendHealth.loading}
-            style={{ fontSize: '0.825rem', padding: '0.5rem 0.9rem' }}
-          >
-            <RefreshCw size={14} className={backendHealth.loading ? 'spin' : ''} />
-            <span>Health Check</span>
-          </button>
-          <button
-            id="btn-refresh-dashboard"
-            className="btn-secondary"
-            onClick={() => fetchDashboard(activeVehicleId, true)}
-            disabled={refreshing || loading}
-            style={{ fontSize: '0.825rem', padding: '0.5rem 0.9rem' }}
-          >
-            <RefreshCw size={14} className={refreshing ? 'spin' : ''} />
-            <span>{refreshing ? 'Refreshing...' : 'Refresh Data'}</span>
-          </button>
-        </div>
-      </section>
+
 
       {/* ── ERROR STATE ── */}
       {error && !loading && (

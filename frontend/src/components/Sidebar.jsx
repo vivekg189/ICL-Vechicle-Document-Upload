@@ -7,7 +7,6 @@ import {
   Settings,
   ShieldCheck,
   X,
-  Database,
   UploadCloud
 } from 'lucide-react';
 
@@ -45,7 +44,7 @@ export default function Sidebar({
           </div>
           <div style={{ flex: 1 }}>
             <div className="brand-title">VehicleVault</div>
-            <span className="brand-badge">Stage 3 • PDF Upload</span>
+
           </div>
           {isOpen && (
             <button className="btn-icon" onClick={onClose} style={{ width: '32px', height: '32px', marginLeft: 'auto' }} title="Close menu">
@@ -84,20 +83,7 @@ export default function Sidebar({
         </nav>
 
         <div className="sidebar-footer">
-          <div className="sidebar-status-box">
-            <Database size={18} color="#2563eb" />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b' }}>PostgreSQL Status</div>
-              <div style={{
-                fontSize: '0.8rem', fontWeight: 700,
-                color: backendHealth.database === 'connected' ? '#059669' : '#dc2626',
-                display: 'flex', alignItems: 'center', gap: '4px', marginTop: '1px'
-              }}>
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: backendHealth.database === 'connected' ? '#10b981' : '#ef4444', display: 'inline-block' }} />
-                {backendHealth.database === 'connected' ? 'Connected (5432)' : 'Connecting…'}
-              </div>
-            </div>
-          </div>
+
           <div style={{ fontSize: '0.72rem', color: '#94a3b8', textAlign: 'center', padding: '0.2rem' }}>
             VehicleVault v3.0 • PDF Upload
           </div>

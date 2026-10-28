@@ -52,7 +52,8 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "5000:5000"
+      - "5000:5000"   # Docker frontend (Nginx) uses this via internal network — keep for nginx proxy
+      - "5001:5000"   # Vite dev server proxy target — avoids conflict with any local Flask process
 
   # ----------------------------------------------------------------------------
   # 3. React Frontend Service (Nginx Reverse-Proxy)

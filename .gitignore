@@ -44,3 +44,7 @@ Desktop.ini
 # Database
 *.db
 *.sqlite3
+
+# Uploaded files (runtime data — stored in Docker named volume)
+backend/uploads/*.pdf
+backend/uploads/*.PDF
